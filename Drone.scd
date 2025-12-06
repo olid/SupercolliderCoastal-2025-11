@@ -35,7 +35,7 @@ Synth(\metalDrone, [verbWet: 0.5, tremolo: 1.0, vibrato: 0.01, beats: 1, dust: 1
 (
 ~dronePlay = Routine.new({
 	inf.do({
-		Synth(\metalDrone, [verbWet: 1.0.rand, tremolo: 1.0, vibrato: 0.01, beats: 1, dust: 1]);
+		Synth(\metalDrone, [verbWet: 1.0.rand, tremolo: 0.0, vibrato: 0.01, beats: 1, dust: 1]);
 
 		0.yield;
 	});

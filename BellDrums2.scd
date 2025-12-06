@@ -30,7 +30,7 @@ SynthDef(\snare, { |amp = 0.0, out = 0, ptch = 1.0, cut = 1.0, res = 0.1 |
 	var noise2 = BPF.ar(WhiteNoise.ar(), 1.0.rand.linexp(0, 1, 1000, 12000) * ptch, 0.01 + 0.4.rand, Line.kr(4.0.rand, 0.0, 1.0.rand.linexp(0, 1, 0.01, 0.2)));
 
 	var sig = ((harmonicsHi * 0.3) + (harmonicsLo * 0.3) + (kicker * 1.0) + (noise1 * 1.0) + (noise2 * 1.0) * 2).tanh * amp;
-	sig = RLPF.ar(sig, (amp).linexp(0, 1, 50, 10000), 0.8);
+	sig = RLPF.ar(sig, (amp).linexp(0, 1, 50, 10000), 1.0);
 
 	Out.ar([0, 1], sig);
 }).add;
@@ -61,21 +61,21 @@ SynthDef(\click2, { |amp = 1.0, dec = 0.01, out = 0|
 )
 
 (
-SynthDef(\hihat1, { |amp = 1.0, dec = 0.2, out = 0|
+SynthDef(\hihat1, { |amp = 1.0, dec = 0.8, out = 0|
 	var pitch = 7000;
-	var spread = 0.4;
+	var spread = 0.2;
 
 	var ampEnv = Line.kr(1.0, 0.0, dec, doneAction: Done.freeSelf);
 	var sig = Mix.ar(FSinOsc.ar({ pitch + (pitch * spread).rand2 } ! 16, 0.0, 0.1, 0.0));
 
-	Out.ar([0, 1], sig * 0.4 * ampEnv * ampEnv * ampEnv);
+	Out.ar([0, 1], sig * 0.4 * ampEnv * ampEnv * ampEnv * ampEnv);
 }).add;
 )
 
 (
 SynthDef(\hihat2, { |amp = 1.0, dec = 0.04, out = 0|
 	var pitch = 7000;
-	var spread = 0.4;
+	var spread = 0.2;
 
 	var ampEnv = Line.kr(1.0, 0.0, dec, doneAction: Done.freeSelf);
 	var sig = Mix.ar(FSinOsc.ar({ pitch + (pitch * spread).rand2 } ! 16, 0.0, 0.1, 0.0));
@@ -85,7 +85,7 @@ SynthDef(\hihat2, { |amp = 1.0, dec = 0.04, out = 0|
 )
 
 (
-SynthDef(\scridge, { |amp = 1.0, dec = 0.01, out = 0, timbre = 300|
+SynthDef(\scridge, { |amp = 1.0, dec = 0.08, out = 0, timbre = 300|
 	var pitch = timbre;
 	var spread = 0.7;
 
@@ -111,17 +111,17 @@ SynthDef(\scridge, { |amp = 1.0, dec = 0.01, out = 0, timbre = 300|
 
 	var rollType;
 
-	var drums = [0, 1];// 0, 0, 1];
+	var drums = [0, 0, 1];// 0, 0, 1];
 
 	var beatsByDrum = [
-		[1, 1, 1, 1, 1, 8],//1, 1, 1, 3, 3, 8],//1, 1, 1, 1, 2, 2, 3],//, 4, 8],
-		[1, 2, 3],//, 1, 1, 1, 1, 1, 2, 2, 3],
+		[1, 1, 1, 3],//1, 1, 1, 1, 2, 2, 3],//, 4, 8],
+		[1, 1, 1, 1],//, 1, 1, 1, 1, 1, 2, 2, 3],
 		[2]
 	];
 
 	var rollsByDrum = [
-		[1, 1, 1, 1, 1, 1, 1, 2, 3, 4],//, 3, 3],
-		[1, 1, 1, 1, 1, 1, 1, 2, 3, 4],//, 2, 3, 4],
+		[1, 1, 2],//, 3, 3],
+		[1, 1, 2, 3, 4, 6],//, 2, 3, 4],
 		[1]
 	];
 
@@ -133,7 +133,7 @@ SynthDef(\scridge, { |amp = 1.0, dec = 0.01, out = 0, timbre = 300|
 		click = 2;//[0, 1].choose;
 		hat = 2;//[0, 1].choose;
 
-		rollType = [1, 2, 3, 3].choose;
+		rollType = [1, 2, 3].choose;
 		if (rollType == 0, { amp = 0.0; decay = 0.0 }, { });
 		if (rollType == 1, { amp = 1.0; decay = 0.0 }, { });
 		if (rollType == 2, { amp = 0.1; decay = 1.2 + 0.3.rand }, { });
@@ -171,8 +171,8 @@ SynthDef(\scridge, { |amp = 1.0, dec = 0.01, out = 0, timbre = 300|
 		var waitTime = if (drum == 2, { ~bpm / 60.0 }, { (hold / (~bpm / 15.0)) });
 		var loopCount = if (drum == 2, { 1 }, { count });
 
-/*		if (hat == 0, { Synth(\hihat1, [amp: amp]) });
-		if (hat == 1, { Synth(\hihat2, [amp: amp]) });*/
+		if (hat == 0, { Synth(\hihat1, [amp: amp]) });
+		if (hat == 1, { Synth(\hihat2, [amp: amp]) });
 
 		for (1, loopCount, {
 			if (drum == 0, { Synth(\kick, [amp: amp, ptch: ptch]) });
@@ -180,10 +180,6 @@ SynthDef(\scridge, { |amp = 1.0, dec = 0.01, out = 0, timbre = 300|
 
 			if (click == 0, { Synth(\click1, [amp: amp]) });
 			if (click == 1, { Synth(\click2, [amp: amp]) });
-
-			if (hat == 0, { Synth(\hihat1, [amp: amp]) });
-			if (hat == 1, { Synth(\hihat2, [amp: amp]) });
-			// if (hat == 1, { Synth(\scridge, [amp: amp, timbre: timbre]) });
 
 			amp = amp * decay;
 
